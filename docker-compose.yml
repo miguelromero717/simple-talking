@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  db_st:
+    image: postgres:15.5
+    container_name: db_st_container
+    env_file:
+      - ./conf/db/.db.env
+    ports:
+      - "5438:5432"
+    volumes:
+      - db_st_data:/var/lib/postgresql/data
+    networks:
+      backend_network:
+    restart: on-failure
+
+volumes:
+  db_st_data:
+
+networks:
+  backend_network:
