@@ -2,7 +2,8 @@ package com.miguelromero717.simpletalking.messages.service
 
 import com.miguelromero717.simpletalking.messages.Message
 import com.miguelromero717.simpletalking.messages.MessageRepository
-import com.miguelromero717.simpletalking.messages.SendMessageRequestDTO
+import com.miguelromero717.simpletalking.messages.dto.MessageDTO
+import com.miguelromero717.simpletalking.messages.dto.SendMessageRequestDTO
 import com.miguelromero717.simpletalking.shared.UserNotFoundException
 import com.miguelromero717.simpletalking.users.UserRepository
 import jakarta.transaction.Transactional
@@ -42,6 +43,15 @@ class MessagesService(
     ) {
         if (senderId == receiverId) {
             throw IllegalArgumentException("Sender and receiver cannot be the same")
+        }
+    }
+    
+    override fun getMessagesReceived(userId: String): List<MessageDTO> {
+        val receiver = userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Receiver not found")
+        val messagesReceivedByUser = messageRepository.findByReceiver(receiver = receiver)
+        
+        return messagesReceivedByUser.map { message ->
+            MessageDTO(message = message)
         }
     }
 }
