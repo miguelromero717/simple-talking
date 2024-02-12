@@ -45,4 +45,17 @@ class MessagesController(
         val messages = messagesService.getMessagesSent(userId = userId)
         return ResponseEntity.ok(messages)
     }
+    
+    @GetMapping("/received/by-user")
+    fun getMessagesReceivedBySpecificUser(
+        @RequestHeader("user-id") userId: String,
+        @RequestParam("senderId") senderId: String
+    ): ResponseEntity<List<MessageDTO>> {
+        val messages = messagesService.getMessagesReceivedFromSpecificSender(
+            receiverId = userId,
+            senderId = senderId
+        )
+        
+        return ResponseEntity.ok(messages)
+    }
 }

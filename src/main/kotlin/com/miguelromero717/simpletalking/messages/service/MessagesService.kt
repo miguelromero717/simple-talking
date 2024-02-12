@@ -6,8 +6,8 @@ import com.miguelromero717.simpletalking.messages.dto.MessageDTO
 import com.miguelromero717.simpletalking.messages.dto.SendMessageRequestDTO
 import com.miguelromero717.simpletalking.shared.UserNotFoundException
 import com.miguelromero717.simpletalking.users.UserRepository
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
@@ -46,20 +46,37 @@ class MessagesService(
         }
     }
     
+    @Transactional(readOnly = true)
     override fun getMessagesReceived(userId: String): List<MessageDTO> {
         val receiver = userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Receiver not found")
         val messagesReceivedByUser = messageRepository.findByReceiver(receiver = receiver)
         
-        return messagesReceivedByUser.map { message ->
-            MessageDTO(message = message)
-        }
+        return buildListMessagesDTOResponse(messages = messagesReceivedByUser)
     }
     
+    @Transactional(readOnly = true)
     override fun getMessagesSent(userId: String): List<MessageDTO> {
         val sender = userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Sender not found")
         val messagesSentByUser = messageRepository.findBySender(sender = sender)
         
-        return messagesSentByUser.map { message ->
+        return buildListMessagesDTOResponse(messages = messagesSentByUser)
+    }
+
+    @Transactional(readOnly = true)
+    override fun getMessagesReceivedFromSpecificSender(receiverId: String, senderId: String): List<MessageDTO> {
+        val receiver = userRepository.findByExternalId(externalId = receiverId) ?: throw UserNotFoundException("Receiver not found")
+        val sender = userRepository.findByExternalId(externalId = senderId) ?: throw UserNotFoundException("Sender not found")
+        
+        val messagesReceivedBySpecificUser = messageRepository.findByReceiverAndSender(
+            receiver = receiver,
+            sender = sender
+        )
+        
+        return buildListMessagesDTOResponse(messages = messagesReceivedBySpecificUser)
+    }
+    
+    private fun buildListMessagesDTOResponse(messages: List<Message>): List<MessageDTO> {
+        return messages.map { message ->
             MessageDTO(message = message)
         }
     }

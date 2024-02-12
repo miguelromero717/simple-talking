@@ -10,4 +10,6 @@ interface IMessagesService {
     fun getMessagesReceived(userId: String): List<MessageDTO>
     
     fun getMessagesSent(userId: String): List<MessageDTO>
+    
+    fun getMessagesReceivedFromSpecificSender(receiverId: String, senderId: String): List<MessageDTO>
 }
