@@ -54,4 +54,13 @@ class MessagesService(
             MessageDTO(message = message)
         }
     }
+    
+    override fun getMessagesSent(userId: String): List<MessageDTO> {
+        val sender = userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Sender not found")
+        val messagesSentByUser = messageRepository.findBySender(sender = sender)
+        
+        return messagesSentByUser.map { message ->
+            MessageDTO(message = message)
+        }
+    }
 }

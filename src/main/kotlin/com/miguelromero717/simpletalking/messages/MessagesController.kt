@@ -20,11 +20,11 @@ class MessagesController(
     
     @PostMapping("/send")
     fun sendMessage(
-        @RequestHeader("sender-id") senderId: String,
+        @RequestHeader("user-id") userId: String,
         @RequestBody payload: SendMessageRequestDTO
     ) : ResponseEntity<String> {
         messagesService.sendMessage(
-            senderId = senderId,
+            senderId = userId,
             payload = payload
         )
         return ResponseEntity.ok().body("Message sent!")
@@ -32,9 +32,17 @@ class MessagesController(
     
     @GetMapping("/received")
     fun getMessagesReceived(
-        @RequestParam("userId") userId: String,
+        @RequestHeader("user-id") userId: String
     ): ResponseEntity<List<MessageDTO>> {
         val messages = messagesService.getMessagesReceived(userId = userId)
+        return ResponseEntity.ok(messages)
+    }
+    
+    @GetMapping("/sent")
+    fun getMessagesSent(
+        @RequestHeader("user-id") userId: String
+    ): ResponseEntity<List<MessageDTO>> {
+        val messages = messagesService.getMessagesSent(userId = userId)
         return ResponseEntity.ok(messages)
     }
 }

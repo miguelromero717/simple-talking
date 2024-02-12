@@ -8,4 +8,6 @@ interface IMessagesService {
     fun sendMessage(senderId: String, payload: SendMessageRequestDTO)
     
     fun getMessagesReceived(userId: String): List<MessageDTO>
+    
+    fun getMessagesSent(userId: String): List<MessageDTO>
 }
