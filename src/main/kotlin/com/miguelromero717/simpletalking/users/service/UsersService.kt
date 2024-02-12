@@ -17,7 +17,6 @@ class UsersService(
             nickname = nickname,
             externalId = UUID.randomUUID().toString()
         )
-        userRepository.save(user)
-        return user
+        return userRepository.save(user)
     }
 }
