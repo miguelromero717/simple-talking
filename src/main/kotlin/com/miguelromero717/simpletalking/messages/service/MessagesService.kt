@@ -2,6 +2,8 @@ package com.miguelromero717.simpletalking.messages.service
 
 import com.miguelromero717.simpletalking.messages.Message
 import com.miguelromero717.simpletalking.messages.MessageRepository
+import com.miguelromero717.simpletalking.messages.async.MessageSchema
+import com.miguelromero717.simpletalking.messages.async.MessagesProducer
 import com.miguelromero717.simpletalking.messages.dto.MessageDTO
 import com.miguelromero717.simpletalking.messages.dto.SendMessageRequestDTO
 import com.miguelromero717.simpletalking.shared.UserNotFoundException
@@ -13,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class MessagesService(
     private val messageRepository: MessageRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val messagesProducer: MessagesProducer
 ) : IMessagesService {
     
     override fun sendMessage(
@@ -26,15 +29,23 @@ class MessagesService(
         )
         
         val sender = userRepository.findByExternalId(senderId) ?: throw UserNotFoundException("Sender not found")
-        val receiver = userRepository.findByExternalId(payload.receiverId) ?: throw UserNotFoundException("Receiver not found")
+        val receiver =
+            userRepository.findByExternalId(payload.receiverId) ?: throw UserNotFoundException("Receiver not found")
         
-        messageRepository.saveAndFlush(
-            Message(
-                sender = sender,
-                receiver = receiver,
+        messagesProducer.publish(
+            payload = MessageSchema(
+                senderNickname = sender.nickname,
+                receiverNickname = receiver.nickname,
                 payload = payload.payload
             )
         )
+//        messageRepository.saveAndFlush(
+//            Message(
+//                sender = sender,
+//                receiver = receiver,
+//                payload = payload.payload
+//            )
+//        )
     }
     
     private fun checkSenderNotReceiver(
@@ -48,7 +59,8 @@ class MessagesService(
     
     @Transactional(readOnly = true)
     override fun getMessagesReceived(userId: String): List<MessageDTO> {
-        val receiver = userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Receiver not found")
+        val receiver =
+            userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Receiver not found")
         val messagesReceivedByUser = messageRepository.findByReceiver(receiver = receiver)
         
         return buildListMessagesDTOResponse(messages = messagesReceivedByUser)
@@ -56,16 +68,19 @@ class MessagesService(
     
     @Transactional(readOnly = true)
     override fun getMessagesSent(userId: String): List<MessageDTO> {
-        val sender = userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Sender not found")
+        val sender =
+            userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Sender not found")
         val messagesSentByUser = messageRepository.findBySender(sender = sender)
         
         return buildListMessagesDTOResponse(messages = messagesSentByUser)
     }
-
+    
     @Transactional(readOnly = true)
     override fun getMessagesReceivedFromSpecificSender(receiverId: String, senderId: String): List<MessageDTO> {
-        val receiver = userRepository.findByExternalId(externalId = receiverId) ?: throw UserNotFoundException("Receiver not found")
-        val sender = userRepository.findByExternalId(externalId = senderId) ?: throw UserNotFoundException("Sender not found")
+        val receiver = userRepository.findByExternalId(externalId = receiverId)
+            ?: throw UserNotFoundException("Receiver not found")
+        val sender =
+            userRepository.findByExternalId(externalId = senderId) ?: throw UserNotFoundException("Sender not found")
         
         val messagesReceivedBySpecificUser = messageRepository.findByReceiverAndSender(
             receiver = receiver,
