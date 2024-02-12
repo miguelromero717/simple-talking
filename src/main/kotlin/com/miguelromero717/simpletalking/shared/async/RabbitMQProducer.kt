@@ -1,8 +1,8 @@
 package com.miguelromero717.simpletalking.shared.async
 
-import com.miguelromero717.simpletalking.shared.utils.ObjectMapper
-import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 abstract class RabbitMQProducer<T>(
     override var queueName: String,
@@ -11,14 +11,15 @@ abstract class RabbitMQProducer<T>(
 ) : RabbitMQ {
     
     @Autowired
-    override lateinit var rabbitTemplate: RabbitTemplate
+    @Qualifier("amqpTemplate")
+    override lateinit var queueTemplate: AmqpTemplate
     
     fun publish(payload: T) {
         try {
-            rabbitTemplate.convertAndSend(
+            queueTemplate.convertAndSend(
                 exchangeName,
                 routingKeyName,
-                ObjectMapper.commonMapper.writeValueAsString(payload)
+                payload
             )
         } catch (e: Exception) {
             throw e

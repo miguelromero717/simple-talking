@@ -1,10 +1,10 @@
 package com.miguelromero717.simpletalking.shared.async
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.core.AmqpTemplate
 
 internal interface RabbitMQ {
     
-    var rabbitTemplate: RabbitTemplate
+    var queueTemplate: AmqpTemplate
     var queueName: String
     var exchangeName: String
     var routingKeyName: String

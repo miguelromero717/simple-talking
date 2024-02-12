@@ -34,18 +34,26 @@ class MessagesService(
         
         messagesProducer.publish(
             payload = MessageSchema(
-                senderNickname = sender.nickname,
-                receiverNickname = receiver.nickname,
+                senderId = sender.externalId,
+                receiverId = receiver.externalId,
                 payload = payload.payload
             )
         )
-//        messageRepository.saveAndFlush(
-//            Message(
-//                sender = sender,
-//                receiver = receiver,
-//                payload = payload.payload
-//            )
-//        )
+    }
+    
+    override fun processMessage(payload: MessageSchema) {
+        val sender =
+            userRepository.findByExternalId(payload.senderId) ?: throw UserNotFoundException("Sender not found")
+        val receiver =
+            userRepository.findByExternalId(payload.receiverId) ?: throw UserNotFoundException("Receiver not found")
+        
+        messageRepository.saveAndFlush(
+            Message(
+                sender = sender,
+                receiver = receiver,
+                payload = payload.payload
+            )
+        )
     }
     
     private fun checkSenderNotReceiver(
