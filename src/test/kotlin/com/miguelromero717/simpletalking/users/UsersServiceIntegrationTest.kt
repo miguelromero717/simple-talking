@@ -16,20 +16,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ContextConfiguration(classes = [SimpleTalkingApplication::class])
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UsersServiceIntegrationTest {
-    
     @Autowired
     private lateinit var userRepository: UserRepository
-    
+
     @Autowired
     private lateinit var usersService: UsersService
-    
+
     @Test
     fun `test creating user`() {
         val nickname = "user123"
         val createdUser = usersService.createUser(nickname)
-        
+
         val userFromDatabase = userRepository.findByExternalId(externalId = createdUser.externalId)
-        
+
         assertEquals(createdUser.nickname, userFromDatabase?.nickname)
     }
 }

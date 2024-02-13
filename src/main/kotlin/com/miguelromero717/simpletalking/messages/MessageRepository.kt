@@ -7,6 +7,11 @@ import org.springframework.stereotype.Repository
 @Repository
 interface MessageRepository : JpaRepository<Message, Int> {
     fun findByReceiver(receiver: User): List<Message>
+
     fun findBySender(sender: User): List<Message>
-    fun findByReceiverAndSender(receiver: User, sender: User): List<Message>
+
+    fun findByReceiverAndSender(
+        receiver: User,
+        sender: User,
+    ): List<Message>
 }

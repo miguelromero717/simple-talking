@@ -11,9 +11,9 @@ class MessagesProducer(
     @Value("\${rabbitmq.queue.exchange}")
     private val exchange: String,
     @Value("\${rabbitmq.queue.routingKey}")
-    private val routingKey: String
+    private val routingKey: String,
 ) : RabbitMQProducer<MessageSchema>(
-    queueName = queue,
-    exchangeName = exchange,
-    routingKeyName = routingKey
-)
+        queueName = queue,
+        exchangeName = exchange,
+        routingKeyName = routingKey,
+    )

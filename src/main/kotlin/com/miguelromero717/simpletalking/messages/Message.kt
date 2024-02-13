@@ -13,10 +13,8 @@ class Message(
     @OneToOne
     @JoinColumn(name = "sender_id")
     var sender: User,
-    
     @OneToOne
     @JoinColumn(name = "receiver_id")
     var receiver: User,
-    
-    var payload: String
+    var payload: String,
 ) : BaseEntity()

@@ -9,7 +9,6 @@ import jakarta.persistence.Table
 @Table(name = "users")
 class User(
     var nickname: String,
-    
     @Column(name = "external_id")
-    var externalId: String
-): BaseEntity()
+    var externalId: String,
+) : BaseEntity()

@@ -7,9 +7,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class MessagesConsumer(
-    private val messagesService: IMessagesService
+    private val messagesService: IMessagesService,
 ) : RabbitMQConsumer<MessageSchema>() {
-    
     @RabbitListener(queues = ["\${rabbitmq.queue.name}"])
     override fun consume(payload: MessageSchema) {
         messagesService.processMessage(payload)

@@ -16,88 +16,93 @@ import org.springframework.transaction.annotation.Transactional
 class MessagesService(
     private val messageRepository: MessageRepository,
     private val userRepository: UserRepository,
-    private val messagesProducer: MessagesProducer
+    private val messagesProducer: MessagesProducer,
 ) : IMessagesService {
-    
     override fun sendMessage(
         senderId: String,
-        payload: SendMessageRequestDTO
+        payload: SendMessageRequestDTO,
     ) {
         checkSenderNotReceiver(
             senderId = senderId,
-            receiverId = payload.receiverId
+            receiverId = payload.receiverId,
         )
-        
+
         val sender = userRepository.findByExternalId(senderId) ?: throw UserNotFoundException("Sender not found")
         val receiver =
             userRepository.findByExternalId(payload.receiverId) ?: throw UserNotFoundException("Receiver not found")
-        
+
         messagesProducer.publish(
-            payload = MessageSchema(
-                senderId = sender.externalId,
-                receiverId = receiver.externalId,
-                payload = payload.payload
-            )
+            payload =
+                MessageSchema(
+                    senderId = sender.externalId,
+                    receiverId = receiver.externalId,
+                    payload = payload.payload,
+                ),
         )
     }
-    
+
     override fun processMessage(payload: MessageSchema) {
         val sender =
             userRepository.findByExternalId(payload.senderId) ?: throw UserNotFoundException("Sender not found")
         val receiver =
             userRepository.findByExternalId(payload.receiverId) ?: throw UserNotFoundException("Receiver not found")
-        
+
         messageRepository.saveAndFlush(
             Message(
                 sender = sender,
                 receiver = receiver,
-                payload = payload.payload
-            )
+                payload = payload.payload,
+            ),
         )
     }
-    
+
     private fun checkSenderNotReceiver(
         senderId: String,
-        receiverId: String
+        receiverId: String,
     ) {
         if (senderId == receiverId) {
             throw IllegalArgumentException("Sender and receiver cannot be the same")
         }
     }
-    
+
     @Transactional(readOnly = true)
     override fun getMessagesReceived(userId: String): List<MessageDTO> {
         val receiver =
             userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Receiver not found")
         val messagesReceivedByUser = messageRepository.findByReceiver(receiver = receiver)
-        
+
         return buildListMessagesDTOResponse(messages = messagesReceivedByUser)
     }
-    
+
     @Transactional(readOnly = true)
     override fun getMessagesSent(userId: String): List<MessageDTO> {
         val sender =
             userRepository.findByExternalId(externalId = userId) ?: throw UserNotFoundException("Sender not found")
         val messagesSentByUser = messageRepository.findBySender(sender = sender)
-        
+
         return buildListMessagesDTOResponse(messages = messagesSentByUser)
     }
-    
+
     @Transactional(readOnly = true)
-    override fun getMessagesReceivedFromSpecificSender(receiverId: String, senderId: String): List<MessageDTO> {
-        val receiver = userRepository.findByExternalId(externalId = receiverId)
-            ?: throw UserNotFoundException("Receiver not found")
+    override fun getMessagesReceivedFromSpecificSender(
+        receiverId: String,
+        senderId: String,
+    ): List<MessageDTO> {
+        val receiver =
+            userRepository.findByExternalId(externalId = receiverId)
+                ?: throw UserNotFoundException("Receiver not found")
         val sender =
             userRepository.findByExternalId(externalId = senderId) ?: throw UserNotFoundException("Sender not found")
-        
-        val messagesReceivedBySpecificUser = messageRepository.findByReceiverAndSender(
-            receiver = receiver,
-            sender = sender
-        )
-        
+
+        val messagesReceivedBySpecificUser =
+            messageRepository.findByReceiverAndSender(
+                receiver = receiver,
+                sender = sender,
+            )
+
         return buildListMessagesDTOResponse(messages = messagesReceivedBySpecificUser)
     }
-    
+
     private fun buildListMessagesDTOResponse(messages: List<Message>): List<MessageDTO> {
         return messages.map { message ->
             MessageDTO(message = message)

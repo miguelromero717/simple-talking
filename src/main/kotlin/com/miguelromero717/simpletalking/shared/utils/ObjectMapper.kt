@@ -5,9 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 object ObjectMapper {
-    
-    val commonMapper = jacksonObjectMapper().apply {
-        registerModules(JavaTimeModule())
-        disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    }
+    val commonMapper =
+        jacksonObjectMapper().apply {
+            registerModules(JavaTimeModule())
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        }
 }

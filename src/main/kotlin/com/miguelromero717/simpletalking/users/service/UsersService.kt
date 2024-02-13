@@ -9,14 +9,14 @@ import java.util.UUID
 @Service
 @Transactional
 class UsersService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : IUsersService {
-    
     override fun createUser(nickname: String): User {
-        val user = User(
-            nickname = nickname,
-            externalId = UUID.randomUUID().toString()
-        )
+        val user =
+            User(
+                nickname = nickname,
+                externalId = UUID.randomUUID().toString(),
+            )
         return userRepository.save(user)
     }
 }

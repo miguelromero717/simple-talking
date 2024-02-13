@@ -6,5 +6,5 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class SendMessageRequestDTO(
     val receiverId: String,
-    val payload: String
+    val payload: String,
 )

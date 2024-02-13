@@ -10,12 +10,12 @@ data class MessageDTO(
     val senderNickname: String,
     val receiverNickname: String,
     val payload: String,
-    val sentAt: Instant
+    val sentAt: Instant,
 ) {
-    constructor(message: Message): this(
+    constructor(message: Message) : this(
         senderNickname = message.sender.nickname,
         receiverNickname = message.receiver.nickname,
         payload = message.payload,
-        sentAt = message.createdAt
+        sentAt = message.createdAt,
     )
 }

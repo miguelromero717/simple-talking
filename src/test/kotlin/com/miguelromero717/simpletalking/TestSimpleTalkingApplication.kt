@@ -11,19 +11,17 @@ import org.testcontainers.utility.DockerImageName
 
 @TestConfiguration(proxyBeanMethods = false)
 class TestSimpleTalkingApplication {
-    
     @Bean
     @ServiceConnection
     fun postgresContainer(): PostgreSQLContainer<*> {
         return PostgreSQLContainer(DockerImageName.parse("postgres:latest"))
     }
-    
+
     @Bean
     @ServiceConnection
     fun rabbitContainer(): RabbitMQContainer {
         return RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"))
     }
-    
 }
 
 fun main(args: Array<String>) {

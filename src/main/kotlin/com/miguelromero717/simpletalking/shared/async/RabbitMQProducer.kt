@@ -7,19 +7,18 @@ import org.springframework.beans.factory.annotation.Qualifier
 abstract class RabbitMQProducer<T>(
     override var queueName: String,
     override var exchangeName: String,
-    override var routingKeyName: String
+    override var routingKeyName: String,
 ) : RabbitMQ {
-    
     @Autowired
     @Qualifier("amqpTemplate")
     override lateinit var queueTemplate: AmqpTemplate
-    
+
     fun publish(payload: T) {
         try {
             queueTemplate.convertAndSend(
                 exchangeName,
                 routingKeyName,
-                payload
+                payload,
             )
         } catch (e: Exception) {
             throw e

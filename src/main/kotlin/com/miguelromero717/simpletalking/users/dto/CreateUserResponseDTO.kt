@@ -7,10 +7,10 @@ import com.miguelromero717.simpletalking.users.User
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class CreateUserResponseDTO(
     val nickname: String,
-    val userId: String
+    val userId: String,
 ) {
-    constructor(user: User): this(
+    constructor(user: User) : this(
         nickname = user.nickname,
-        userId = user.externalId
+        userId = user.externalId,
     )
 }

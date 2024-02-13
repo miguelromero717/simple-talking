@@ -20,43 +20,45 @@ import org.springframework.web.context.WebApplicationContext
 
 @SpringBootTest
 class UsersControllerTest {
-    
     @Autowired
     lateinit var webApplicationContext: WebApplicationContext
-    
+
     lateinit var mockMvc: MockMvc
-    
+
     @MockBean
     private lateinit var userService: IUsersService
-    
+
     @BeforeEach
     fun setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build()
     }
-    
+
     @Test
     fun `test creating user`() {
-        val user = User(
-            externalId = "user123",
-            nickname = "user123"
-        )
-        val requestDTO = CreateUserRequestDTO("user123")
-        val expectedResponse = ResponseEntity.ok().body(
-            CreateUserResponseDTO(
-                user = user
+        val user =
+            User(
+                externalId = "user123",
+                nickname = "user123",
             )
-        )
-        
+        val requestDTO = CreateUserRequestDTO("user123")
+        val expectedResponse =
+            ResponseEntity.ok().body(
+                CreateUserResponseDTO(
+                    user = user,
+                ),
+            )
+
         `when`(userService.createUser(requestDTO.nickname)).thenReturn(user)
-        
-        val response = mockMvc.perform(
-            post("/v1/users")
-                .content("""{"nickname": "user123"}""")
-                .contentType("application/json")
-        ).andExpect(status().isOk).andReturn().response.contentAsString
-        
+
+        val response =
+            mockMvc.perform(
+                post("/v1/users")
+                    .content("""{"nickname": "user123"}""")
+                    .contentType("application/json"),
+            ).andExpect(status().isOk).andReturn().response.contentAsString
+
         val responseObj = ObjectMapper.commonMapper.readValue(response, CreateUserResponseDTO::class.java)
-        
+
         assertEquals(expectedResponse.body?.userId, responseObj?.userId)
         assertEquals(expectedResponse.body?.nickname, responseObj?.nickname)
     }
