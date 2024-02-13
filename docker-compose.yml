@@ -22,6 +22,20 @@ services:
     networks:
       backend_network:
     restart: on-failure
+  api_st:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: simple-talking-image
+    container_name: api_st
+    depends_on:
+      - db_st
+      - rabbitmq_st
+    ports:
+      - "8080:8081"
+    networks:
+      - backend_network
+    restart: on-failure
 
 volumes:
   db_st_data:
